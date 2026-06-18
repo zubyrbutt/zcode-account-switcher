@@ -1,7 +1,7 @@
 {
   "name": "zcode-account-switcher",
   "version": "1.0.0",
-  "description": "ZCode 账号无感切换工具 —— 备份/恢复登录态快照，免去重复 OAuth+验证码登录",
+  "description": "ZCode account switcher with macOS support. Seamlessly switch between domestic and international ZCode accounts with one click.",
   "type": "commonjs",
   "main": "src/cli.js",
   "bin": {
@@ -13,8 +13,9 @@
     "list": "node src/cli.js list",
     "status": "node src/cli.js status",
     "quota": "node src/cli.js quota",
-    "desktop": "npm --prefix desktop start",
+    "desktop": "npm run build && npm --prefix desktop start",
     "desktop:dev": "npm --prefix desktop run dev",
+    "setup": "npm --prefix desktop install && npm run build && npm run desktop",
     "build": "npm --prefix desktop run build"
   },
   "engines": {

@@ -19,24 +19,37 @@ An **invisible** account switching tool for ZCode that comes in two forms: a **d
 
 ---
 
-## Desktop App (Recommended · GUI)
-
-### macOS
+## Quick Start (First Time)
 
 ```bash
-cd zcode-account-switcher/desktop
-npm install && npm run build && npm start
+git clone https://github.com/zubyrbutt/zcode-account-switcher.git
+cd zcode-account-switcher
+npm run setup
 ```
 
-Or from the project root:
+This single command installs dependencies, builds the UI, and launches the desktop app.
+
+## Desktop App (Recommended · GUI)
+
+### macOS / Linux
 
 ```bash
-npm run build && npm run desktop
+npm run setup
+```
+
+Or if already set up:
+
+```bash
+npm run desktop
 ```
 
 ### Windows
 
-Double-click `启动桌面版.bat`. The first launch will automatically install dependencies and build the UI.
+```cmd
+npm run setup
+```
+
+Or double-click `启动桌面版.bat`.
 
 ### Usage
 
