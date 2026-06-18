@@ -38,9 +38,19 @@ const ZCODE_EXE_CANDIDATES = [
 const STORE_DIR = path.join(__dirname, '..', 'accounts');
 
 /**
- * 找到 ZCode.exe 的实际路径
+ * 找到 ZCode 的实际路径
  */
 function findZCodeExe() {
+  if (process.platform === 'darwin') {
+    const candidates = [
+      '/Applications/ZCode.app',
+      path.join(os.homedir(), 'Applications', 'ZCode.app'),
+    ];
+    for (const p of candidates) {
+      try { if (fs.existsSync(p)) return p; } catch (_) {}
+    }
+    return null;
+  }
   for (const p of ZCODE_EXE_CANDIDATES) {
     try {
       if (fs.existsSync(p)) return p;

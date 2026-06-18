@@ -21,11 +21,21 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  */
 function isZCodeRunning() {
   try {
-    const out = execSync('tasklist /FI "IMAGENAME eq ZCode.exe" /NH /FO CSV', {
-      encoding: 'utf8',
-      windowsHide: true,
-    });
-    return /"ZCode\.exe"/i.test(out);
+    if (process.platform === 'win32') {
+      const out = execSync('tasklist /FI "IMAGENAME eq ZCode.exe" /NH /FO CSV', {
+        encoding: 'utf8',
+        windowsHide: true,
+      });
+      return /"ZCode\.exe"/i.test(out);
+    }
+    // macOS / Linux: check for ZCode or zcode-cli process
+    try {
+      execSync('pgrep -x ZCode', { encoding: 'utf8', stdio: 'ignore' });
+      return true;
+    } catch (_) {
+      execSync('pgrep -x zcode-cli', { encoding: 'utf8', stdio: 'ignore' });
+      return true;
+    }
   } catch (_) {
     return false;
   }
@@ -37,9 +47,14 @@ function isZCodeRunning() {
 async function killZCode({ waitMs = 8000 } = {}) {
   if (!isZCodeRunning()) return true;
   try {
-    execSync('taskkill /F /IM ZCode.exe', { encoding: 'utf8', windowsHide: true, stdio: 'ignore' });
+    if (process.platform === 'win32') {
+      execSync('taskkill /F /IM ZCode.exe', { encoding: 'utf8', windowsHide: true, stdio: 'ignore' });
+    } else {
+      execSync('pkill -x ZCode', { stdio: 'ignore' });
+      execSync('pkill -x zcode-cli', { stdio: 'ignore' });
+    }
   } catch (_) {
-    // 即使 taskkill 失败也继续等
+    // 即使 kill 失败也继续等
   }
   const deadline = Date.now() + waitMs;
   while (Date.now() < deadline) {
@@ -54,10 +69,13 @@ async function killZCode({ waitMs = 8000 } = {}) {
  */
 function launchZCode() {
   const exe = findZCodeExe();
-  if (!exe) throw new Error('找不到 ZCode.exe，请确认安装路径（paths.js 里 ZCODE_INSTALL_DIR）');
-  // detached + 独立 stdio，避免阻塞本工具退出
+  if (!exe) throw new Error('找不到 ZCode，请确认安装路径');
   try {
-    exec(`"${exe}"`, { windowsHide: false, detached: true, stdio: 'ignore' }).unref();
+    if (process.platform === 'darwin' && exe.endsWith('.app')) {
+      exec(`open "${exe}"`, { detached: true, stdio: 'ignore' }).unref();
+    } else {
+      exec(`"${exe}"`, { windowsHide: false, detached: true, stdio: 'ignore' }).unref();
+    }
     return true;
   } catch (e) {
     throw new Error('启动 ZCode 失败: ' + e.message);
