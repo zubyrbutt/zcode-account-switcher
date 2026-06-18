@@ -141,6 +141,7 @@
     "selectedForExport": "Экспортировать этот аккаунт при выборе",
     "selectExport": "Выбрать для экспорта {label}",
     "current": "Текущий",
+    "currentTooltip": "Этот аккаунт сейчас активен и используется",
     "capturedAt": "Снято {date}",
     "quota": "Квота",
     "refreshQuota": "Обновить квоту этого аккаунта",
@@ -158,7 +159,8 @@
       "pro": "Pro",
       "max": "Max",
       "zai": "Z.ai",
-      "std": "Standard"
+      "std": "Standard",
+      "tooltip": "План подписки"
     },
     "nearDepleted": "Почти исчерпано",
     "remaining": "Осталось",
@@ -172,7 +174,8 @@
     "switchToThis": "Переключиться на этот аккаунт",
     "switching": "Переключение…",
     "oneClickSwitch": "Переключить в один клик",
-    "noQuotaHint": "Нет квоты"
+    "noQuotaHint": "Нет квоты",
+    "launchInNewInstance": "Запустить в новом экземпляре"
   },
   "toolbarState": {
     "selectedForExport": "Выбрано {count} аккаунтов для экспорта",
@@ -181,6 +184,55 @@
     "unselectVisible": "Снять выбор с текущих результатов",
     "clearSelection": "Очистить выбор",
     "deleteSelected": "Удалить выбранные"
+  },
+  "instances": {
+    "title": "Экземпляры",
+    "accountsTab": "Аккаунты",
+    "instancesTab": "Экземпляры",
+    "createInstance": "Создать экземпляр",
+    "id": "ID",
+    "statusRunning": "Работает",
+    "statusStopped": "Остановлен",
+    "pid": "PID",
+    "createdAt": "Создан {date}",
+    "lastUsed": "Использован {date}",
+    "neverUsed": "Не использован",
+    "launch": "Запустить",
+    "stop": "Остановить",
+    "remove": "Удалить",
+    "rename": "Переименовать",
+    "launchSuccess": "Экземпляр запущен (PID: {pid})",
+    "launchFailed": "Ошибка запуска: {error}",
+    "stopSuccess": "Экземпляр остановлен",
+    "removeConfirm": "Удалить экземпляр «{label}»? Все его данные будут удалены.",
+    "createModalTitle": "Создать новый экземпляр",
+    "createModalDesc": "Создаётся изолированный экземпляр ZCode с собственной папкой данных. Можно одновременно запускать несколько аккаунтов.",
+    "createModalPlaceholder": "Назовите экземпляр (например: Рабочий аккаунт)",
+    "createSuccess": "Экземпляр «{label}» создан",
+    "confirmRemove": "Удалить",
+    "noInstances": "Пока нет экземпляров",
+    "noInstancesHint": "Создавайте изолированные экземпляры ZCode для одновременной работы с несколькими аккаунтами.",
+    "assignAccount": "Назначить аккаунт",
+    "unassignAccount": "Открепить аккаунт",
+    "assignedAccount": "Назначен аккаунт: {label}",
+    "unassignedAccount": "Аккаунт откреплён",
+    "assignFailed": "Не удалось назначить аккаунт",
+    "noAccountsToAssign": "Нет доступных аккаунтов"
+  },
+  "wakeup": {
+    "title": "Пробуждение",
+    "running": "Работает",
+    "off": "Выключено",
+    "start": "Запустить",
+    "stop": "Остановить",
+    "interval": "Интервал",
+    "minutes": "мин",
+    "hour": "час",
+    "cycle": "Цикл",
+    "lastRun": "Было:",
+    "nextRun": "Далее:",
+    "lastResults": "{ok} успешно · {fail} ошибок",
+    "waitingFirst": "Ожидание первого цикла…"
   },
   "toast": {
     "exportFailed": "Экспорт не выполнен",
@@ -201,6 +253,7 @@
     "renameFailed": "Не удалось переименовать: {error}",
     "rolledBack": "Откат выполнен",
     "rollbacking": "Выполняется откат…",
-    "rollbackFailed": "Не удалось откатить: {error}"
+    "rollbackFailed": "Не удалось откатить: {error}",
+    "creatingInstance": "Создание экземпляра…"
   }
 }

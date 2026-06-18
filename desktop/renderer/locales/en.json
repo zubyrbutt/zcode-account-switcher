@@ -141,6 +141,7 @@
     "selectedForExport": "Export this account when selected",
     "selectExport": "Select export {label}",
     "current": "Current",
+    "currentTooltip": "This account is currently active and in use",
     "capturedAt": "Captured at {date}",
     "quota": "Quota",
     "refreshQuota": "Refresh this account quota",
@@ -158,7 +159,8 @@
       "pro": "Pro",
       "max": "Max",
       "zai": "Z.ai",
-      "std": "Standard"
+      "std": "Standard",
+      "tooltip": "Membership plan"
     },
     "nearDepleted": "Near depleted",
     "remaining": "Remaining",
@@ -172,7 +174,8 @@
     "switchToThis": "Switch to this account",
     "switching": "Switching…",
     "oneClickSwitch": "One-click switch",
-    "noQuotaHint": "No quota"
+    "noQuotaHint": "No quota",
+    "launchInNewInstance": "Launch in new instance"
   },
   "toolbarState": {
     "selectedForExport": "{count} accounts selected for export",
@@ -181,6 +184,55 @@
     "unselectVisible": "Unselect current results",
     "clearSelection": "Clear selection",
     "deleteSelected": "Delete selected"
+  },
+  "instances": {
+    "title": "Instances",
+    "accountsTab": "Accounts",
+    "instancesTab": "Instances",
+    "createInstance": "Create Instance",
+    "id": "ID",
+    "statusRunning": "Running",
+    "statusStopped": "Stopped",
+    "pid": "PID",
+    "createdAt": "Created {date}",
+    "lastUsed": "Last used {date}",
+    "neverUsed": "Never used",
+    "launch": "Launch",
+    "stop": "Stop",
+    "remove": "Remove",
+    "rename": "Rename",
+    "launchSuccess": "Instance launched (PID: {pid})",
+    "launchFailed": "Launch failed: {error}",
+    "stopSuccess": "Instance stopped",
+    "removeConfirm": "Remove instance \"{label}\"? This will delete all its data.",
+    "createModalTitle": "Create new instance",
+    "createModalDesc": "Create an isolated ZCode instance with its own data directory. You can run multiple accounts simultaneously.",
+    "createModalPlaceholder": "Name this instance (e.g. Work Account)",
+    "createSuccess": "Instance \"{label}\" created",
+    "confirmRemove": "Remove",
+    "noInstances": "No instances yet",
+    "noInstancesHint": "Create isolated ZCode instances to run multiple accounts simultaneously.",
+    "assignAccount": "Assign account",
+    "unassignAccount": "Unassign account",
+    "assignedAccount": "Assigned account: {label}",
+    "unassignedAccount": "Account unassigned",
+    "assignFailed": "Failed to assign account",
+    "noAccountsToAssign": "No accounts available to assign"
+  },
+  "wakeup": {
+    "title": "Wake-up",
+    "running": "Running",
+    "off": "Off",
+    "start": "Start",
+    "stop": "Stop",
+    "interval": "Interval",
+    "minutes": "min",
+    "hour": "hour",
+    "cycle": "Cycle",
+    "lastRun": "Last:",
+    "nextRun": "Next:",
+    "lastResults": "{ok} OK · {fail} fail",
+    "waitingFirst": "Waiting for first cycle…"
   },
   "toast": {
     "exportFailed": "Export failed",
@@ -201,6 +253,7 @@
     "renameFailed": "Rename failed: {error}",
     "rolledBack": "Rolled back",
     "rollbacking": "Rolling back…",
-    "rollbackFailed": "Rollback failed: {error}"
+    "rollbackFailed": "Rollback failed: {error}",
+    "creatingInstance": "Creating instance…"
   }
 }

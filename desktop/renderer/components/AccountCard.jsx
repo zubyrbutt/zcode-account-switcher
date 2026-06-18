@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RefreshCw, Trash2, Pencil, Check } from 'lucide-react';
+import { RefreshCw, Trash2, Pencil, Check, Cpu, CheckCircle2, AlertTriangle, XCircle, HelpCircle, Crown, Star, Zap, Rocket, Shield } from 'lucide-react';
 import { useI18n } from '../i18n.js';
 
 function fmtDate(ts, locale) {
@@ -17,11 +17,22 @@ function fmtNumber(value, locale) {
   return new Intl.NumberFormat(locale === 'zh-CN' ? 'zh-CN' : 'en', { maximumFractionDigits: 0 }).format(value);
 }
 
-function healthText(health, t) {
-  if (!health) return t('account.healthUnknown');
-  if (health.status === 'healthy') return t('account.healthHealthy');
-  if (health.status === 'warning') return t('account.healthWarning');
-  return t('account.healthError');
+function healthIcon(health, t) {
+  if (!health || !health.status) return <HelpCircle size={16} title={t('account.healthUnknown')} />;
+  if (health.status === 'healthy') return <CheckCircle2 size={16} title={t('account.healthHealthy')} />;
+  if (health.status === 'warning') return <AlertTriangle size={16} title={t('account.healthWarning')} />;
+  return <XCircle size={16} title={t('account.healthError')} />;
+}
+
+function planIcon(tier, t) {
+  const labels = { max: t('account.plan.max'), pro: t('account.plan.pro'), lite: t('account.plan.lite'), start: t('account.plan.start'), zai: t('account.plan.zai'), std: t('account.plan.std') };
+  switch (tier) {
+    case 'max': return <Crown size={16} title={labels.max} />;
+    case 'pro': return <Star size={16} title={labels.pro} />;
+    case 'lite': return <Zap size={16} title={labels.lite} />;
+    case 'start': return <Rocket size={16} title={labels.start} />;
+    default: return <Shield size={16} title={labels[tier] || labels.std} />;
+  }
 }
 
 function humanizeSummary(summary) {
@@ -52,6 +63,7 @@ export default function AccountCard({
   onRenameStart,
   onRenameCommit,
   onRefreshQuota,
+  onLaunchInNewInstance,
 }) {
   const { locale, t } = useI18n();
   const [editName, setEditName] = useState(account.label);
@@ -103,13 +115,12 @@ export default function AccountCard({
             <span className="account-name">{account.label}</span>
           )}
           {isCurrent && (
-            <span className="account-badge">
-              <Check size={11} />
-              {t('account.current')}
+            <span className="account-badge" title={t('account.currentTooltip')}>
+              <Check size={16} />
             </span>
           )}
-          <span className={`health-badge ${account.health?.status || 'unknown'}`} title={account.health?.summary || t('account.healthUnknown')}>
-            {healthText(account.health, t)}
+          <span className={`health-icon ${account.health?.status || 'unknown'}`} title={account.health?.summary || t('account.healthUnknown')}>
+            {healthIcon(account.health, t)}
           </span>
           {(() => {
             const badge = quota?.ok && quota.data ? quota.data.planTier : null;
@@ -117,7 +128,9 @@ export default function AccountCard({
             const final = badge || fallback;
             if (!final) return null;
             return (
-              <span className={`plan-badge plan-${final.tier}`} title={account.provider}>{final.label}</span>
+              <span className={`plan-icon plan-${final.tier}`} title={`${t('account.plan.tooltip')}: ${account.provider}`}>
+                {planIcon(final.tier, t)}
+              </span>
             );
           })()}
         </div>
@@ -216,6 +229,17 @@ export default function AccountCard({
           )}
           {isCurrent ? t('account.current') : busy ? t('account.switching') : t('account.oneClickSwitch')}
         </button>
+        {onLaunchInNewInstance && (
+          <button
+            className="btn btn-ghost btn-icon"
+            title={t('account.launchInNewInstance')}
+            aria-label={`${t('account.launchInNewInstance')} ${account.label}`}
+            onClick={() => onLaunchInNewInstance(account)}
+            disabled={busy}
+          >
+            <Cpu size={15} />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -141,6 +141,7 @@
     "selectedForExport": "勾选后导出此账号",
     "selectExport": "选择导出 {label}",
     "current": "当前",
+    "currentTooltip": "此账号当前正在使用中",
     "capturedAt": "捕获于 {date}",
     "quota": "额度",
     "refreshQuota": "刷新此账号额度",
@@ -158,7 +159,8 @@
       "pro": "Pro",
       "max": "Max",
       "zai": "Z.ai",
-      "std": "Standard"
+      "std": "Standard",
+      "tooltip": "会员套餐"
     },
     "nearDepleted": "接近耗尽",
     "remaining": "剩余",
@@ -172,7 +174,8 @@
     "switchToThis": "切换到此账号",
     "switching": "切换中…",
     "oneClickSwitch": "一键切换",
-    "noQuotaHint": "暂无额度"
+    "noQuotaHint": "暂无额度",
+    "launchInNewInstance": "在新实例中启动"
   },
   "toolbarState": {
     "selectedForExport": "已选择 {count} 个账号用于导出",
@@ -181,6 +184,55 @@
     "unselectVisible": "取消全选当前结果",
     "clearSelection": "清空选择",
     "deleteSelected": "删除已选"
+  },
+  "instances": {
+    "title": "多实例",
+    "accountsTab": "账号",
+    "instancesTab": "实例",
+    "createInstance": "创建实例",
+    "id": "ID",
+    "statusRunning": "运行中",
+    "statusStopped": "已停止",
+    "pid": "PID",
+    "createdAt": "创建于 {date}",
+    "lastUsed": "最后使用 {date}",
+    "neverUsed": "从未使用",
+    "launch": "启动",
+    "stop": "停止",
+    "remove": "删除",
+    "rename": "重命名",
+    "launchSuccess": "实例已启动（PID: {pid}）",
+    "launchFailed": "启动失败：{error}",
+    "stopSuccess": "实例已停止",
+    "removeConfirm": "确定删除实例「{label}」？这将删除其所有数据。",
+    "createModalTitle": "创建新实例",
+    "createModalDesc": "创建一个独立的 ZCode 实例，拥有自己的数据目录，可同时运行多个账号。",
+    "createModalPlaceholder": "给实例命名（如：工作账号）",
+    "createSuccess": "实例「{label}」已创建",
+    "confirmRemove": "删除",
+    "noInstances": "暂无实例",
+    "noInstancesHint": "创建独立的 ZCode 实例，可同时运行多个账号。",
+    "assignAccount": "分配账号",
+    "unassignAccount": "解除分配",
+    "assignedAccount": "已分配账号：{label}",
+    "unassignedAccount": "账号已解除分配",
+    "assignFailed": "分配账号失败",
+    "noAccountsToAssign": "无可用账号可分配"
+  },
+  "wakeup": {
+    "title": "定时刷新",
+    "running": "运行中",
+    "off": "已关闭",
+    "start": "启动",
+    "stop": "停止",
+    "interval": "间隔",
+    "minutes": "分钟",
+    "hour": "小时",
+    "cycle": "轮次",
+    "lastRun": "上次:",
+    "nextRun": "下次:",
+    "lastResults": "{ok} 成功 · {fail} 失败",
+    "waitingFirst": "等待首次执行…"
   },
   "toast": {
     "exportFailed": "导出失败",
@@ -201,6 +253,7 @@
     "renameFailed": "重命名失败：{error}",
     "rolledBack": "已回滚",
     "rollbacking": "正在回滚…",
-    "rollbackFailed": "回滚失败：{error}"
+    "rollbackFailed": "回滚失败：{error}",
+    "creatingInstance": "正在创建实例…"
   }
 }

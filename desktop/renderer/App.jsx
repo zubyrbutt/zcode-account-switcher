@@ -12,6 +12,9 @@ import {
   Upload,
   Download,
   Languages,
+  Cpu,
+  Play,
+  Square,
 } from 'lucide-react';
 import AccountCard from './components/AccountCard.jsx';
 import StatusBar from './components/StatusBar.jsx';
@@ -19,6 +22,9 @@ import Toolbar from './components/Toolbar.jsx';
 import CaptureModal from './components/CaptureModal.jsx';
 import AddAccountModal from './components/AddAccountModal.jsx';
 import ConfirmDialog from './components/ConfirmDialog.jsx';
+import InstanceCard from './components/InstanceCard.jsx';
+import CreateInstanceModal from './components/CreateInstanceModal.jsx';
+import WakeUpBar from './components/WakeUpBar.jsx';
 import { useI18n } from './i18n.js';
 
 export default function App() {
@@ -41,6 +47,12 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ health: 'all', quota: 'all' });
   const [selectedAccountIds, setSelectedAccountIds] = useState({});
+  const [activeTab, setActiveTab] = useState('accounts');
+  const [instances, setInstances] = useState([]);
+  const [instancesLoading, setInstancesLoading] = useState(false);
+  const [createInstanceOpen, setCreateInstanceOpen] = useState(false);
+
+  const onWakeupEvent = useCallback((cb) => window.api.onWakeupEvent(cb), []);
 
   const nextLocale = locale === 'zh-CN' ? 'en' : locale === 'en' ? 'ru' : 'zh-CN';
 
@@ -502,6 +514,131 @@ export default function App() {
 
   const currentQuota = currentAccountId ? accountQuotas[currentAccountId] : null;
 
+  const refreshInstances = useCallback(async () => {
+    setInstancesLoading(true);
+    const r = await window.api.instanceList();
+    if (r.ok) setInstances(r.data);
+    setInstancesLoading(false);
+  }, []);
+
+  const handleCreateInstance = useCallback(async (label) => {
+    const r = await window.api.instanceCreate({ label });
+    if (r.ok) {
+      showToast('success', t('instances.createSuccess', { label: r.data.label }));
+      setCreateInstanceOpen(false);
+      await refreshInstances();
+    } else {
+      showToast('error', t('instances.launchFailed', { error: r.error }));
+    }
+  }, [refreshInstances, showToast, t]);
+
+  const handleLaunchInstance = useCallback(async (id) => {
+    setBusy(true);
+    const r = await window.api.instanceLaunch(id);
+    setBusy(false);
+    if (r.ok) {
+      showToast('success', t('instances.launchSuccess', { pid: r.data.pid }));
+      await refreshInstances();
+    } else {
+      showToast('error', t('instances.launchFailed', { error: r.error }));
+    }
+  }, [refreshInstances, showToast, t]);
+
+  const handleStopInstance = useCallback(async (id) => {
+    setBusy(true);
+    const r = await window.api.instanceStop(id);
+    setBusy(false);
+    if (r.ok) {
+      showToast('info', t('instances.stopSuccess'));
+      await refreshInstances();
+    } else {
+      showToast('error', r.error);
+    }
+  }, [refreshInstances, showToast, t]);
+
+  const handleRemoveInstance = useCallback((inst) => {
+    setConfirm({
+      title: t('instances.remove'),
+      desc: t('instances.removeConfirm', { label: inst.label }),
+      danger: true,
+      confirmText: t('instances.confirmRemove'),
+      onOk: async () => {
+        setConfirm(null);
+        setBusy(true);
+        const r = await window.api.instanceRemove(inst.id);
+        setBusy(false);
+        if (r.ok) {
+          showToast('info', t('instances.removeConfirm', { label: inst.label }));
+          await refreshInstances();
+        } else {
+          showToast('error', r.error);
+        }
+      },
+    });
+  }, [refreshInstances, showToast, t]);
+
+  const handleRenameInstance = useCallback(async (id, label) => {
+    if (!label) return;
+    const r = await window.api.instanceRename(id, label);
+    if (r.ok) await refreshInstances();
+  }, [refreshInstances]);
+
+  const handleAssignAccount = useCallback(async (instanceId, accountId) => {
+    setBusy(true);
+    const r = await window.api.instanceAssignAccount(instanceId, accountId);
+    setBusy(false);
+    if (r.ok) {
+      showToast('success', t('instances.assignedAccount', { label: r.data.accountLabel }));
+      await refreshInstances();
+    } else {
+      showToast('error', r.error || t('instances.assignFailed'));
+    }
+  }, [refreshInstances, showToast, t]);
+
+  const handleLaunchInNewInstance = useCallback(async (account) => {
+    setBusy(true);
+    showToast('info', t('toast.creatingInstance'));
+    const label = (account.label || account.email || account.id) + ' (instance)';
+    const createR = await window.api.instanceCreate({ label });
+    if (!createR.ok) {
+      showToast('error', t('instances.launchFailed', { error: createR.error }));
+      setBusy(false);
+      return;
+    }
+    const instId = createR.data.id;
+    const assignR = await window.api.instanceAssignAccount(instId, account.id);
+    if (!assignR.ok) {
+      showToast('error', t('instances.assignFailed'));
+      setBusy(false);
+      return;
+    }
+    const launchR = await window.api.instanceLaunch(instId);
+    setBusy(false);
+    if (launchR.ok) {
+      showToast('success', t('instances.launchSuccess', { pid: launchR.data.pid }));
+      setActiveTab('instances');
+      await refreshInstances();
+    } else {
+      showToast('error', t('instances.launchFailed', { error: launchR.error }));
+    }
+  }, [refreshInstances, showToast, t]);
+
+  const handleUnassignAccount = useCallback(async (instanceId) => {
+    setBusy(true);
+    const r = await window.api.instanceUnassignAccount(instanceId);
+    setBusy(false);
+    if (r.ok) {
+      showToast('info', t('instances.unassignedAccount'));
+      await refreshInstances();
+    } else {
+      showToast('error', r.error);
+    }
+  }, [refreshInstances, showToast, t]);
+
+  useEffect(() => {
+    if (activeTab === 'instances') refreshInstances();
+  }, [activeTab, refreshInstances]);
+
   return (
     <div className="app">
       <header className="topbar">
@@ -556,6 +693,27 @@ export default function App() {
 
       <StatusBar status={status} loading={loading} quota={aggregateQuota} quotaLoading={quotaLoading} onRefreshQuota={refreshQuota} currentQuota={currentQuota} />
 
+      <div className="tab-bar">
+        <button
+          className={`tab ${activeTab === 'accounts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('accounts')}
+        >
+          <Users size={14} />
+          {t('instances.accountsTab')}
+        </button>
+        <button
+          className={`tab ${activeTab === 'instances' ? 'active' : ''}`}
+          onClick={() => setActiveTab('instances')}
+        >
+          <Cpu size={14} />
+          {t('instances.instancesTab')}
+        </button>
+      </div>
+
+      <WakeUpBar accountCount={accounts.length} onWakeupEvent={onWakeupEvent} />
+
+      {activeTab === 'accounts' && (
+        <>
       {!loading && accounts.length > 0 && (
         <Toolbar
           search={search}
@@ -635,10 +793,60 @@ export default function App() {
               onRenameStart={() => setRenamingId(acc.id)}
               onRenameCommit={(label) => handleRename(acc, label)}
               onRefreshQuota={refreshOneAccountQuota}
+              onLaunchInNewInstance={handleLaunchInNewInstance}
             />
           ))
         )}
       </main>
+        </>
+      )}
+
+      {activeTab === 'instances' && (
+        <main className="account-list">
+          {instancesLoading ? (
+            <div className="empty">
+              <RefreshCw size={40} className="empty-icon spin" />
+              <p>{t('common.loading')}</p>
+            </div>
+          ) : instances.length === 0 ? (
+            <div className="empty">
+              <Cpu size={56} className="empty-icon" />
+              <strong className="empty-title">{t('instances.noInstances')}</strong>
+              <p>{t('instances.noInstancesHint')}</p>
+              <button className="btn btn-primary empty-action" onClick={() => setCreateInstanceOpen(true)} disabled={busy}>
+                <Plus size={16} />
+                {t('instances.createInstance')}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="instance-list-header">
+                <span className="instance-list-count">
+                  {instances.length} {t('instances.instancesTab')}
+                </span>
+                <button className="btn btn-primary btn-sm" onClick={() => setCreateInstanceOpen(true)} disabled={busy}>
+                  <Plus size={14} />
+                  {t('instances.createInstance')}
+                </button>
+              </div>
+              {instances.map((inst) => (
+                <InstanceCard
+                  key={inst.id}
+                  instance={inst}
+                  accounts={accounts}
+                  busy={busy}
+                  onLaunch={handleLaunchInstance}
+                  onStop={handleStopInstance}
+                  onRemove={handleRemoveInstance}
+                  onRename={handleRenameInstance}
+                  onAssignAccount={handleAssignAccount}
+                  onUnassignAccount={handleUnassignAccount}
+                />
+              ))}
+            </>
+          )}
+        </main>
+      )}
 
       <footer className="footer">
         <button
@@ -663,6 +871,14 @@ export default function App() {
           onConfirm={handleCapture}
           busy={busy}
           defaultName={status?.current ? t('capture.defaultName', { shortId: status.current.shortId }) : ''}
+        />
+      )}
+
+      {createInstanceOpen && (
+        <CreateInstanceModal
+          onClose={() => setCreateInstanceOpen(false)}
+          onConfirm={handleCreateInstance}
+          busy={busy}
         />
       )}
 

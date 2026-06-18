@@ -31,4 +31,22 @@ contextBridge.exposeInMainWorld('api', {
   accountQuotas: (ids) => ipcRenderer.invoke('account:quota-many', ids),
   openExternal: (url) => ipcRenderer.invoke('shell:open-external', url),
   rollback: () => ipcRenderer.invoke('account:rollback'),
+  // 多实例管理
+  instanceList: () => ipcRenderer.invoke('instance:list'),
+  instanceCreate: (opts) => ipcRenderer.invoke('instance:create', opts),
+  instanceLaunch: (id) => ipcRenderer.invoke('instance:launch', id),
+  instanceStop: (id) => ipcRenderer.invoke('instance:stop', id),
+  instanceRemove: (id) => ipcRenderer.invoke('instance:remove', id),
+  instanceRename: (id, label) => ipcRenderer.invoke('instance:rename', id, label),
+  instanceAssignAccount: (instanceId, accountId) => ipcRenderer.invoke('instance:assign-account', instanceId, accountId),
+  instanceUnassignAccount: (instanceId) => ipcRenderer.invoke('instance:unassign-account', instanceId),
+  // Wake-up automation
+  wakeupStart: (config) => ipcRenderer.invoke('wakeup:start', config),
+  wakeupStop: () => ipcRenderer.invoke('wakeup:stop'),
+  wakeupStatus: () => ipcRenderer.invoke('wakeup:status'),
+  onWakeupEvent: (cb) => {
+    const handler = (_e, event) => cb(event);
+    ipcRenderer.on('wakeup:event', handler);
+    return () => ipcRenderer.removeListener('wakeup:event', handler);
+  },
 });

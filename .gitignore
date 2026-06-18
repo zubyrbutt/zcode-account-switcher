@@ -15,6 +15,9 @@ desktop/err.txt
 # 构建产物
 desktop/dist-renderer/
 
+# 实例运行时数据
+instances/
+
 # 本地开发/抓包临时文件
 *.har
 .codex/

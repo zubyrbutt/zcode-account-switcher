@@ -30,6 +30,8 @@ const manager = require('../src/manager');
 const switcher = require('../src/switcher');
 const oauth = require('../src/oauth');
 const quota = require('../src/quota');
+const instanceManager = require('../src/instanceManager');
+const { WakeUpScheduler } = require('../src/wakeup');
 const { ZaiAuthFlow } = require('../src/oauthCli');
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL; // 开发模式由 vite 提供
@@ -343,21 +345,91 @@ ipcMain.handle('account:rollback', async () =>
   wrap(() => switcher.rollback({ restart: true, force: true }), 'rollback')
 );
 
+// ===== 多实例管理 =====
+ipcMain.handle('instance:list', async () =>
+  wrap(() => instanceManager.list(), 'instance-list')
+);
+
+ipcMain.handle('instance:create', async (_evt, opts) =>
+  wrap(() => instanceManager.create(opts || {}), 'instance-create')
+);
+
+ipcMain.handle('instance:launch', async (_evt, id) =>
+  wrap(() => instanceManager.launch(id), 'instance-launch')
+);
+
+ipcMain.handle('instance:stop', async (_evt, id) =>
+  wrap(() => instanceManager.stop(id), 'instance-stop')
+);
+
+ipcMain.handle('instance:remove', async (_evt, id) =>
+  wrap(() => instanceManager.remove(id), 'instance-remove')
+);
+
+ipcMain.handle('instance:rename', async (_evt, id, label) =>
+  wrap(() => instanceManager.update(id, { label }), 'instance-rename')
+);
+
+ipcMain.handle('instance:assign-account', async (_evt, instanceId, accountId) =>
+  wrap(() => instanceManager.assignAccount(instanceId, accountId), 'instance-assign-account')
+);
+
+ipcMain.handle('instance:unassign-account', async (_evt, instanceId) =>
+  wrap(() => instanceManager.unassignAccount(instanceId), 'instance-unassign-account')
+);
+
+// ===== Wake-up Automation（定时唤醒 + 额度刷新）=====
+const _wakeup = new WakeUpScheduler();
+
+_wakeup.on('started', (event) => pushWakeupEvent(event));
+_wakeup.on('stopped', (event) => pushWakeupEvent(event));
+_wakeup.on('cycle-start', (event) => pushWakeupEvent(event));
+_wakeup.on('account-success', (event) => pushWakeupEvent(event));
+_wakeup.on('account-error', (event) => pushWakeupEvent(event));
+_wakeup.on('cycle-end', (event) => pushWakeupEvent(event));
+
+function pushWakeupEvent(event) {
+  try {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('wakeup:event', event);
+    }
+  } catch (_) {}
+}
+
+ipcMain.handle('wakeup:start', async (_evt, config) =>
+  wrap(() => {
+    _wakeup.start(config);
+    return _wakeup.status();
+  }, 'wakeup-start')
+);
+
+ipcMain.handle('wakeup:stop', async () =>
+  wrap(() => {
+    _wakeup.stop();
+    return { stopped: true };
+  }, 'wakeup-stop')
+);
+
+ipcMain.handle('wakeup:status', async () =>
+  wrap(() => _wakeup.status(), 'wakeup-status')
+);
+
 // ===== 生命周期 =====
 app.whenReady().then(() => {
   logInfo(`main start (electron ${process.versions.electron}, chrome ${process.versions.chrome})`);
-  logInfo('backend modules loaded: manager, switcher');
+  logInfo('backend modules loaded: manager, switcher, instanceManager');
   createWindow();
 });
 
 app.on('window-all-closed', () => {
-  // 退出前停止 OAuth 轮询（系统浏览器由用户自行关闭）
   stopOauthPolling();
+  _wakeup.stop();
   if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('before-quit', () => {
   stopOauthPolling();
+  _wakeup.stop();
 });
 
 app.on('activate', () => {

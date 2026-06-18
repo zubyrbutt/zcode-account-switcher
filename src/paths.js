@@ -37,6 +37,9 @@ const ZCODE_EXE_CANDIDATES = [
 // 账号快照存储目录（放在本工具目录下，避免污染 v2）
 const STORE_DIR = path.join(__dirname, '..', 'accounts');
 
+// 多实例数据目录（每个实例独立 HOME + --user-data-dir）
+const INSTANCES_DIR = path.join(__dirname, '..', 'instances');
+
 /**
  * 找到 ZCode 的实际路径
  */
@@ -67,5 +70,6 @@ module.exports = {
   CONFIG_FILE,
   ZCODE_EXE_CANDIDATES,
   STORE_DIR,
+  INSTANCES_DIR,
   findZCodeExe,
 };
